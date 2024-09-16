@@ -1,5 +1,6 @@
 package CommonUtils;
 
+import java.util.Arrays;
 import java.util.EmptyStackException;
 
 /**
@@ -20,6 +21,7 @@ public class BetterStack<E> implements BetterStackInterface<E> {
      * Initial size of stack.  Do not decrease capacity below this value.
      */
     private final int INIT_CAPACITY = 8;
+
 
     /**
      * If the array needs to increase in size, it should be increased to
@@ -48,13 +50,63 @@ public class BetterStack<E> implements BetterStackInterface<E> {
      * note in the class header comment).
      */
     private E[] stack;
+    private int capacity = INIT_CAPACITY;
+    private int size = 0;
 
+    public int getINIT_CAPACITY() {
+        return INIT_CAPACITY;
+    }
+
+    public int getINCREASE_FACTOR() {
+        return INCREASE_FACTOR;
+    }
+
+    public int getCONSTANT_INCREMENT() {
+        return CONSTANT_INCREMENT;
+    }
+
+    public double getDECREASE_FACTOR() {
+        return DECREASE_FACTOR;
+    }
+
+    public E[] getStack() {
+        return stack;
+    }
+
+    public void setStack(E[] stack) {
+        this.stack = stack;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        E news[] = (E[]) new Object[capacity];
+        System.out.println(capacity);
+        int x = -1;
+        for (int i = 0; (i < this.getCapacity()) && (i < capacity); i++) {
+            E a = this.stack[i];
+            news[i] = a;
+            x = i;
+        }
+        System.out.println(x);
+        this.stack = news;
+        this.capacity = capacity;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 
     /**
      * Constructs an empty stack
      */
     @SuppressWarnings("unchecked")
     public BetterStack(){
+        this.stack = (E[]) new Object[INIT_CAPACITY];
+        this.size = 0;
+        this.capacity = INIT_CAPACITY;
         //todo
     }
 
@@ -67,6 +119,18 @@ public class BetterStack<E> implements BetterStackInterface<E> {
      */
     @Override
     public void push(E item) throws OutOfMemoryError {
+        while (this.size() >= this.getCapacity()) {
+            if ((this.getCapacity() * INCREASE_FACTOR) <= Integer.MAX_VALUE) {
+                this.setCapacity(this.getCapacity() * INCREASE_FACTOR);
+            } else if ((this.getCapacity() + CONSTANT_INCREMENT) <= Integer.MAX_VALUE) {
+                this.setCapacity(this.getCapacity() + CONSTANT_INCREMENT);
+            }
+            else {
+                throw new OutOfMemoryError();
+            }
+        }
+        this.stack[this.size()] = item;
+        this.setSize(this.size() + 1);
         //todo
     }
 
@@ -76,10 +140,24 @@ public class BetterStack<E> implements BetterStackInterface<E> {
      * @return the top of the stack
      * @throws EmptyStackException if stack is empty
      */
+    /**
+     * If the number of elements stored is < capacity * DECREASE_FACTOR, it should decrease
+     * the capacity of the UDS to max(capacity * DECREASE_FACTOR, initial capacity).
+     *
+     */
     @Override
     public E pop() {
         //todo
-        return null;
+        if (this.isEmpty()) {
+            throw new EmptyStackException();
+        }
+        E re_val = this.stack[this.size() - 1];
+        this.stack[this.size() - 1] = null;
+        this.setSize(this.size() - 1);
+        while ((this.size() < (this.getCapacity() * DECREASE_FACTOR)) && (this.getCapacity() > INIT_CAPACITY)) {
+            this.setCapacity(((this.getCapacity() * DECREASE_FACTOR) > INIT_CAPACITY) ? (int) (this.getCapacity() * DECREASE_FACTOR) : INIT_CAPACITY);
+        }
+        return re_val;
     }
 
     /**
@@ -90,8 +168,11 @@ public class BetterStack<E> implements BetterStackInterface<E> {
      */
     @Override
     public E peek() {
+        if (this.isEmpty()) {
+            throw new EmptyStackException();
+        }
         //todo
-        return null;
+        return this.stack[0];
     }
 
     /**
@@ -102,7 +183,7 @@ public class BetterStack<E> implements BetterStackInterface<E> {
     @Override
     public boolean isEmpty() {
         //todo
-        return false;
+        return this.size() == 0;
     }
 
     /**
@@ -113,7 +194,7 @@ public class BetterStack<E> implements BetterStackInterface<E> {
     @Override
     public int size() {
         //todo
-        return -1;
+        return this.size;
     }
 
     /**

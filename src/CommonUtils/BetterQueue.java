@@ -1,6 +1,9 @@
 package CommonUtils;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Queue;
 
 /**
  * @implNote implement a queue using a circular array with initial capacity 8.
@@ -22,12 +25,80 @@ import java.awt.*;
  * @param <E> the type of object this queue will be holding
  */
 public class BetterQueue<E> implements BetterQueueInterface<E> {
+    public int getINIT_CAPACITY() {
+        return INIT_CAPACITY;
+    }
+
+    public int getINCREASE_FACTOR() {
+        return INCREASE_FACTOR;
+    }
+
+    public int getCONSTANT_INCREMENT() {
+        return CONSTANT_INCREMENT;
+    }
+
+    public double getDECREASE_FACTOR() {
+        return DECREASE_FACTOR;
+    }
+
+    public E[] getQueue() {
+        return queue;
+    }
+
+    public void setQueue(E[] queue) {
+        this.queue = queue;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        System.out.println("set capacity running with " + capacity);
+        int old = this.getCapacity();
+        this.capacity = capacity;
+        E newq[] = (E[]) new Object[capacity];
+        for (int i = 0; (i < old) && (i < capacity); i++) {
+            if (this.queue[i] != null) {
+                newq[i] = this.queue[i];
+            }
+        }
+        System.out.println("ended");
+        this.setQueue(newq);
+    }
+
+    public int getSize() {
+        return this.size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public int getFront() {
+        return front;
+    }
+
+    public void setFront(int front) {
+        this.front = front;
+    }
+
+    public int getBack() {
+        return back;
+    }
+
+    public void setBack(int back) {
+        this.back = back;
+    }
 
     /**
      * Initial size of queue.  Do not decrease capacity below this value.
      */
     private final int INIT_CAPACITY = 8;
-
+    private int capacity = INIT_CAPACITY;
+    private int size = 0;
+    private int front = 0;
+    private int back = 0;
 
     /**
      * If the array needs to increase in size, it should be increased to
@@ -79,6 +150,7 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
      */
     @SuppressWarnings("unchecked")
     public BetterQueue(){
+        this.queue = (E[]) new Object[this.getCapacity()];
         //todo
     }
 
@@ -91,6 +163,26 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
     @Override
     public void add(E item) {
         //todo
+        if (item == null) {
+            throw new NullPointerException();
+        }
+        int s = this.getSize();
+        int c;
+        while (s >= (c=this.getCapacity())) {
+            if (c * INCREASE_FACTOR <= Integer.MAX_VALUE) {
+                this.setCapacity(c * INCREASE_FACTOR);
+            }
+            else if (c + CONSTANT_INCREMENT <= Integer.MAX_VALUE) {
+                this.setCapacity(c * CONSTANT_INCREMENT);
+            }
+            else {
+                throw new OutOfMemoryError();
+            }
+        }
+        this.queue[this.back] = item;
+
+        this.setBack((this.getBack() + 1) % this.getCapacity());
+        this.setSize(this.getSize() + 1);
     }
 
     /**
@@ -101,7 +193,8 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
     @Override
     public E peek() {
         //todo
-        return null;
+        if (this.isEmpty()) { return null;}
+        return this.queue[this.getFront()];
     }
 
     /**
@@ -112,7 +205,17 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
     @Override
     public E remove() {
         //todo
-        return null;
+        if (this.isEmpty()) {
+            return null;
+        }
+        while ((this.getSize() < (this.getCapacity() * DECREASE_FACTOR)) && (this.getCapacity() != INIT_CAPACITY)) {
+            this.setCapacity(((this.getCapacity() * DECREASE_FACTOR) > INIT_CAPACITY) ? (int) (this.getCapacity() * DECREASE_FACTOR) : INIT_CAPACITY);
+        }
+        E return_val = this.queue[front];
+        this.queue[front] = null;
+        this.setFront((this.getFront() + 1) % this.getCapacity());
+        this.setSize(this.getSize() - 1);
+        return return_val;
     }
 
     /**
@@ -123,7 +226,7 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
     @Override
     public int size() {
         //todo
-        return -1;
+        return this.getSize();
     }
 
     /**
@@ -134,7 +237,7 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
     @Override
     public boolean isEmpty() {
         //todo
-        return false;
+        return (this.getSize() == 0);
     }
 
     /**
