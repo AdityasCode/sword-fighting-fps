@@ -1,5 +1,7 @@
 package Drones;
 
+import CommonUtils.BetterStack;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +27,23 @@ public class ItemRequestManager implements ItemRequestManagerInterface {
             // as all of the inputs are on the same line, it is actually more efficient to use scanner's nextInt since
             // with BufferedReader you would have to read in the entire line (possibly 10m integers long) at once
             Scanner scan = new Scanner(new FileReader(filename));
+            int nreqs = scan.nextInt();
+            int runtime = scan.nextInt();
+            ArrayList<Integer> reqs = new ArrayList<>();
+            for (int i = 0; i < nreqs; i++) {
+                reqs.add(scan.nextInt());
+            }
+            int positions[] = new int[nreqs];
+            BetterStack stack = new BetterStack();
+            for (int t = 0; t < Integer.MAX_VALUE; t++) {
+                if (stack.size() != nreqs) {
+                    while (reqs.get(0) <= t) {
+                        stack.push(reqs.get(0));
+                        reqs.remove(0);
+                    }
+                }
+                if ()
+            }
 
             //todo
 

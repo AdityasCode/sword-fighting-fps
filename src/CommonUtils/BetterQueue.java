@@ -49,22 +49,25 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
         this.queue = queue;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public long getCapacity() {
+        return this.capacity;
     }
 
-    public void setCapacity(int capacity) {
-        System.out.println("set capacity running with " + capacity);
-        int old = this.getCapacity();
-        this.capacity = capacity;
-        E newq[] = (E[]) new Object[capacity];
-        for (int i = 0; (i < old) && (i < capacity); i++) {
-            if (this.queue[i] != null) {
-                newq[i] = this.queue[i];
-            }
+    public void setCapacity(long newcap) {
+        //System.out.printf("capacity changing from %d to %d\n", this.getCapacity(), newcap);
+        long oldcap = this.getCapacity();
+        E newq[] = (E[]) new Object[(int) newcap];
+        int oldfront = this.getFront();
+        int oldback = this.getBack();
+        E q[] = this.getQueue();
+        for (int i = 0; i < this.getSize(); i++) {
+            E olde = q[(int) ((oldfront + i) % oldcap)];
+            newq[i] = olde;
         }
-        System.out.println("ended");
+        this.setFront(0);
+        this.setBack(this.getSize());
         this.setQueue(newq);
+        this.capacity = newcap;
     }
 
     public int getSize() {
@@ -72,6 +75,7 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
     }
 
     public void setSize(int size) {
+        //System.out.printf("size changed from %d to %d\n", this.size, size);
         this.size = size;
     }
 
@@ -95,7 +99,7 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
      * Initial size of queue.  Do not decrease capacity below this value.
      */
     private final int INIT_CAPACITY = 8;
-    private int capacity = INIT_CAPACITY;
+    private long capacity = INIT_CAPACITY;
     private int size = 0;
     private int front = 0;
     private int back = 0;
@@ -150,7 +154,7 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
      */
     @SuppressWarnings("unchecked")
     public BetterQueue(){
-        this.queue = (E[]) new Object[this.getCapacity()];
+        this.queue = (E[]) new Object[INIT_CAPACITY];
         //todo
     }
 
@@ -162,27 +166,31 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
      */
     @Override
     public void add(E item) {
+        //System.out.println("element adding: " + item);
         //todo
         if (item == null) {
             throw new NullPointerException();
         }
         int s = this.getSize();
-        int c;
-        while (s >= (c=this.getCapacity())) {
-            if (c * INCREASE_FACTOR <= Integer.MAX_VALUE) {
+        long c = this.getCapacity();
+        if (c <= s) {
+            if (c * INCREASE_FACTOR <= (long) Integer.MAX_VALUE) {
                 this.setCapacity(c * INCREASE_FACTOR);
             }
             else if (c + CONSTANT_INCREMENT <= Integer.MAX_VALUE) {
-                this.setCapacity(c * CONSTANT_INCREMENT);
+                this.setCapacity(c + CONSTANT_INCREMENT);
             }
             else {
                 throw new OutOfMemoryError();
             }
         }
         this.queue[this.back] = item;
-
-        this.setBack((this.getBack() + 1) % this.getCapacity());
+        this.setBack(this.getBack() + 1);
         this.setSize(this.getSize() + 1);
+        if ((this.getSize() < this.getCapacity()) && (this.getBack() == this.getCapacity())) {
+            this.setBack(0);
+        }
+
     }
 
     /**
@@ -208,13 +216,13 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
         if (this.isEmpty()) {
             return null;
         }
+        E return_val = this.queue[front];
+        this.queue[front] = null;
+        this.setFront((int) ((this.getFront() + 1) % this.getCapacity()));
+        this.setSize(this.getSize() - 1);
         while ((this.getSize() < (this.getCapacity() * DECREASE_FACTOR)) && (this.getCapacity() != INIT_CAPACITY)) {
             this.setCapacity(((this.getCapacity() * DECREASE_FACTOR) > INIT_CAPACITY) ? (int) (this.getCapacity() * DECREASE_FACTOR) : INIT_CAPACITY);
         }
-        E return_val = this.queue[front];
-        this.queue[front] = null;
-        this.setFront((this.getFront() + 1) % this.getCapacity());
-        this.setSize(this.getSize() - 1);
         return return_val;
     }
 

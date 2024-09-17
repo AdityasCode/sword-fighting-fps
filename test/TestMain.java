@@ -12,12 +12,19 @@ public class TestMain {
 //        }
 //        newq.setCapacity(16);
 //    }
-        BetterStack newstack = new BetterStack();
-        for (int i = 0; i < 10; i++) {
-            newstack.push(i);
+//        BetterStack newstack = new BetterStack();
+//        for (int i = 0; i < 10; i++) {
+//            newstack.push(i);
+//        }
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println(newstack.getStack()[i]);
+//        }
+        int b;
+        for (b = 0; b < 10; b++) {
+            if (b == 5) {
+                break;
+            }
         }
-        for (int i = 0; i < 10; i++) {
-            System.out.println(newstack.getStack()[i]);
-        }
+        System.out.println(b);
     }
 }
