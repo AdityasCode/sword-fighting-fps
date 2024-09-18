@@ -1,9 +1,6 @@
 package CommonUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Queue;
 
 /**
  * @implNote implement a queue using a circular array with initial capacity 8.
@@ -25,21 +22,6 @@ import java.util.Queue;
  * @param <E> the type of object this queue will be holding
  */
 public class BetterQueue<E> implements BetterQueueInterface<E> {
-    public int getINIT_CAPACITY() {
-        return INIT_CAPACITY;
-    }
-
-    public int getINCREASE_FACTOR() {
-        return INCREASE_FACTOR;
-    }
-
-    public int getCONSTANT_INCREMENT() {
-        return CONSTANT_INCREMENT;
-    }
-
-    public double getDECREASE_FACTOR() {
-        return DECREASE_FACTOR;
-    }
 
     public E[] getQueue() {
         return queue;
@@ -54,11 +36,9 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
     }
 
     public void setCapacity(long newcap) {
-        //System.out.printf("capacity changing from %d to %d\n", this.getCapacity(), newcap);
         long oldcap = this.getCapacity();
         E newq[] = (E[]) new Object[(int) newcap];
         int oldfront = this.getFront();
-        int oldback = this.getBack();
         E q[] = this.getQueue();
         for (int i = 0; i < this.getSize(); i++) {
             E olde = q[(int) ((oldfront + i) % oldcap)];

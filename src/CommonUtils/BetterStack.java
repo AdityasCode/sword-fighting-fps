@@ -1,6 +1,5 @@
 package CommonUtils;
 
-import java.util.Arrays;
 import java.util.EmptyStackException;
 
 /**
@@ -53,21 +52,6 @@ public class BetterStack<E> implements BetterStackInterface<E> {
     private int capacity = INIT_CAPACITY;
     private int size = 0;
 
-    public int getINIT_CAPACITY() {
-        return INIT_CAPACITY;
-    }
-
-    public int getINCREASE_FACTOR() {
-        return INCREASE_FACTOR;
-    }
-
-    public int getCONSTANT_INCREMENT() {
-        return CONSTANT_INCREMENT;
-    }
-
-    public double getDECREASE_FACTOR() {
-        return DECREASE_FACTOR;
-    }
 
     public E[] getStack() {
         return stack;
@@ -83,14 +67,12 @@ public class BetterStack<E> implements BetterStackInterface<E> {
 
     public void setCapacity(int capacity) {
         E news[] = (E[]) new Object[capacity];
-        System.out.println(capacity);
         int x = -1;
         for (int i = 0; (i < this.getCapacity()) && (i < capacity); i++) {
             E a = this.stack[i];
             news[i] = a;
             x = i;
         }
-        System.out.println(x);
         this.stack = news;
         this.capacity = capacity;
     }
@@ -172,7 +154,7 @@ public class BetterStack<E> implements BetterStackInterface<E> {
             throw new EmptyStackException();
         }
         //todo
-        return this.stack[0];
+        return this.stack[this.size() - 1];
     }
 
     /**

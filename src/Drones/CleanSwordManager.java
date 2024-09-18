@@ -21,7 +21,6 @@ public class CleanSwordManager implements CleanSwordManagerInterface {
      */
     @Override
     public ArrayList<CleanSwordTimes> getCleaningTimes(String filename) {
-        System.out.println(filename);
         ArrayList<CleanSwordTimes> returns = new ArrayList<>();
         try {
             BufferedReader bf = new BufferedReader(new FileReader(filename));
@@ -36,31 +35,24 @@ public class CleanSwordManager implements CleanSwordManagerInterface {
                 nmt[i] = Integer.parseInt(str);
                 i++;
             }
-            i = 0;
-            int clean_times[] = new int[nmt[0]];
-            BetterQueue<Integer> requests = new BetterQueue<>();
+            long clean_times[] = new long[nmt[0]];
+            BetterQueue<Long> requests = new BetterQueue<>();
             String thisline;
             for (i = 0; (i < nmt[0]) && ((thisline = bf.readLine()) != null); i++) {
-                clean_times[i] = Integer.parseInt(thisline);
+                clean_times[i] = Long.parseLong(thisline);
             }
             for (i = 0; (i < nmt[1]) && ((thisline = bf.readLine()) != null); i++) {
-                requests.add(Integer.parseInt(thisline));
+                requests.add(Long.parseLong(thisline));
             }
-//            while (bf != null) {
-//                for (i = 0; i < nmt[0]; i++) {
-//                    clean_times[i] = Integer.parseInt(thisline);
-//                }
-//                for (i = 0; i < nmt[1]; i++) {
-//                    requests.add(Integer.parseInt(bf.readLine()));
-//                }
-//            }
-            int max_time = nmt[1] * nmt[2];
             int currsword = 0;
             bf.close();
-            for (int t = 0; ((t <= Integer.MAX_VALUE) && (!requests.isEmpty())); t++) {
-                while (( ((Object []) requests.getQueue())[requests.getFront()] != null) && (((int) ((Object []) requests.getQueue())[requests.getFront()]) <= t)) {
+            biggestLoop: for (long t = 0; ((t < Long.MAX_VALUE) && (!requests.isEmpty())); t++) {
+                int iter = 0;
+                while (((long) ((Object []) requests.getQueue())[requests.getFront()]) <= t) {
+                    System.out.println("iter is " + iter + " t is " + t);
+                    iter++;
                     if (clean_times[currsword] <= 0) {
-                        Integer lastreq = requests.remove();
+                        Long lastreq = requests.remove();
                         returns.add(new CleanSwordTimes(t, t - lastreq));
                         clean_times[currsword] = nmt[2];
                         currsword = (currsword + 1) % nmt[0];
@@ -68,35 +60,22 @@ public class CleanSwordManager implements CleanSwordManagerInterface {
                     else {
                         break;
                     }
+                    if (returns.size() == nmt[1]) {
+                        break biggestLoop;
+                    }
                 }
                 if (clean_times[currsword] <= 0) {
                     for (int j = 0; (currsword + j) < nmt[0]; j++) {
-                        int nextsword = clean_times[currsword + j];
+                        Long nextsword = clean_times[currsword + j];
                         if (nextsword > 0) {
                             clean_times[currsword + j] -= 1;
                             break;
                         }
                     }
                 }
-                clean_times[currsword] -= 1;
-//                while (clean_times[currsword] <= 0) {
-//                    while (requests.getQueue()[requests.getFront()] <= t) {
-//                        Integer lastreq = requests.remove();
-//                       returns.add(new CleanSwordTimes(t, t - lastreq));
-//                        clean_times[currsword] = nmt[3];
-//                    }
-//                    currsword = (currsword + 1) % nmt[0];
-//                }
-
-//                for (int s = 0; s < nmt[0]; s++) {
-//                    --clean_times[s];
-//                    if (clean_times[s] <= 0) {
-//                        if (requests.getQueue()[requests.getFront()] <= t) {
-//                            requests.remove();
-//                            returns.add(new CleanSwordTimes());
-//                        }
-//                    }
-//                }
+                else {
+                    clean_times[currsword] -= 1;
+                }
             }
 
             //todo
@@ -106,10 +85,6 @@ public class CleanSwordManager implements CleanSwordManagerInterface {
             System.err.println("ATTENTION TAs: Couldn't find test file: \"" + filename + "\":: " + e.getMessage());
             System.exit(1);
         }
-//        for (CleanSwordTimes c : returns) {
-//            c.timeFilled++;
-//            c.timeToFulfill++;
-//        }
         return returns;
     }
 }
