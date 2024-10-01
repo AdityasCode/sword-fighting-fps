@@ -1,12 +1,10 @@
-package Drones;
+package DronesOld;
 
 import CommonUtils.BetterStack;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -25,29 +23,51 @@ public class ItemRequestManager implements ItemRequestManagerInterface {
      */
     @Override
     public ArrayList<ItemRetrievalTimes> getRetrievalTimes(String filename) {
-        System.out.println(filename);
         ArrayList<ItemRetrievalTimes> returns = new ArrayList<>();
         try {
+
+            // force exit out of any loop!
+
+            long myNuke = 0;
+            long myNuke1 = 0;
+
+
             // as all of the inputs are on the same line, it is actually more efficient to use scanner's nextInt since
             // with BufferedReader you would have to read in the entire line (possibly 10m integers long) at once
+
             Scanner scan = new Scanner(new FileReader(filename));
             int nreqs = scan.nextInt();
             int runtime = scan.nextInt() + 1;
             ArrayList<Long> reqs = new ArrayList<>();
             for (int i = 0; i < nreqs; i++) {
+                if (myNuke == Long.MAX_VALUE) {
+                    break;
+                }
+                myNuke++;
                 reqs.add(scan.nextLong());
             }
+            myNuke = 0;
             ArrayList<Integer> positions = new ArrayList<>();
             for (int i = 0; i < nreqs; i++) {
+                if (myNuke == Long.MAX_VALUE) {
+                    break;
+                }
+                myNuke++;
                 positions.add(runtime);
             }
+            myNuke = 0;
 
             // track position
 
             ArrayList<Integer> map = new ArrayList<>();
             for (int i = 1; i <= (runtime); i++) {
+                if (myNuke == Long.MAX_VALUE) {
+                    break;
+                }
+                myNuke++;
                 map.add(i);
             }
+            myNuke = 0;
 //            for (int i = runtime; i > 0; i--) {
 //                map.add(i * (-1));
 //            }
@@ -55,38 +75,27 @@ public class ItemRequestManager implements ItemRequestManagerInterface {
             boolean hasItem = false;
             long currReqTime = reqs.get(0);
             long destination = runtime;
-            long currIndex = 0;
+            int currIndex = 0;
 
             // stack of requests
 
-            BetterStack<Long> stack = new BetterStack();
+            BetterStack<ItemRetrievalTimes> stack = new BetterStack();
             for (long t = 0; t < Long.MAX_VALUE; t++) {
+                if (myNuke == Long.MAX_VALUE) {
+                    break;
+                }
+                myNuke++;
                 if (t < reqs.get(0)) {
                     continue;
                 }
                 if (position < 1) {
                     position = 1;
-                    System.out.println("INCORRECT HANDLING OF POSITION");
-                }
-                System.out.println("big loop run: time #" + t);
-                System.out.printf("time: %d, position: %d, hasItem: %b\n", t, position, hasItem);
-                try {
-                    System.out.printf("stack top: %d\n", stack.peek());
-                } catch (EmptyStackException e) {
-                    System.out.println("empty stack");
-                }
-                System.out.println("all positions:");
-                for (long p : positions) {
-                    System.out.println(p);
-                }
-                if (t == 10) {
-                    System.out.println("hello");
                 }
 
                 // SUCCESSFUL CONDITION: at starting, non empty stack, have item
 
                 if ((position == 1) && (!stack.isEmpty()) && (hasItem)) {
-                    Object removed = stack.pop();
+                    ItemRetrievalTimes removed = stack.pop();
 //                    int startsAt= 0;
 //                    boolean found = false;
 //                    for (int i = 0; i < nreqs; i++) {
@@ -99,8 +108,11 @@ public class ItemRequestManager implements ItemRequestManagerInterface {
 //                        }
 //                    }
 //                    returns.add(new ItemRetrievalTimes(startsAt, t));
-                    returns.add(new ItemRetrievalTimes(reqs.indexOf(currReqTime), t));
+                    returns.add(new ItemRetrievalTimes(removed.getIndex(), t));
                     hasItem = false;
+                    if (!stack.isEmpty()) {
+                        currIndex = stack.peek().getIndex();
+                    }
                 }
 
                 // HAS EVERY REQ BEEN FULFILLED NOW?
@@ -117,17 +129,26 @@ public class ItemRequestManager implements ItemRequestManagerInterface {
                 // if theres a more urgent request, keep it in the stack and push more important ones on
 
                 boolean found = false;
-                for (int i = 0; i < nreqs; i++) {
+                for (int i = currIndex; i < nreqs; i++) {
+                    if (myNuke1 == Long.MAX_VALUE) {
+                        break;
+                    }
+                    myNuke1++;
+                    if (i == -1) {
+                        break;
+                    }
                     if (reqs.get(i) == t) {
                         found = true;
                         hasItem = false;
-                        stack.push(reqs.get(i));
+                        stack.push(new ItemRetrievalTimes(i, reqs.get(i)));
+//                        stack.push(reqs.get(i));
                         currIndex = i;
                     }
                     if (found && reqs.get(i) != t) {
                         break;
                     }
                 }
+                myNuke1 = 0;
 
                 // IS STACK EMPTY/NO REQUESTS: MOVE BACK TO BASE AND MOVE TO THE NEXT ITERATION
 
@@ -141,15 +162,19 @@ public class ItemRequestManager implements ItemRequestManagerInterface {
 
                 // THERE IS A REQUEST IN THE STACK: CHECK WHICH ONE AND MARK IT
 
-                currReqTime = stack.peek();
+                currReqTime = stack.peek().getTimeFilled();
 
                 // DO I HAVE THE ITEM? IF NOT, MOVE TO STORAGE; OTHERWISE, MOVE TO BASE
 
                 if (!hasItem) {
-                    if (position != positions.get(reqs.indexOf(currReqTime))) {
+                    if (position != positions.get(currIndex)) {
                         position +=1;
+                        if (position == positions.get((int) currIndex)) {
+                            hasItem = true;
+                        }
                     } else {
                         hasItem = true;
+                        position -= 1;
                     }
                 }
 
@@ -157,18 +182,16 @@ public class ItemRequestManager implements ItemRequestManagerInterface {
 
                 else {
                     position -= 1;
-                    positions.set(reqs.indexOf(currReqTime), position);
+                    positions.set(currIndex, position);
                 }
 
                 // AM I AT THE POSITION OF THE ITEM (EITHER STORAGE(RUNTIME) OR THE PLACE IT WAS DROPPED AT)? IF SO,
                 // MARK THAT I HAVE NOW GOT IT
 
-                if (position == positions.get(reqs.indexOf(currReqTime))) {
-                    hasItem = true;
-                }
 
                 // ALL POSSIBLE SCENARIOS HAVE BEEN COVERED.
             }
+            myNuke = 0;
 
             //todo
 
@@ -176,9 +199,6 @@ public class ItemRequestManager implements ItemRequestManagerInterface {
             //This should never happen... uh oh o.o
             System.err.println("ATTENTION TAs: Couldn't find test file: \"" + filename + "\":: " + e.getMessage());
             System.exit(1);
-        }
-        for (ItemRetrievalTimes i : returns) {
-            System.out.println(i.toString());
         }
         return returns;
     }

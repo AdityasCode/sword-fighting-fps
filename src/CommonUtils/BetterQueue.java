@@ -1,5 +1,7 @@
 package CommonUtils;
 
+import CommonUtilsOld.BetterQueueInterface;
+
 import java.awt.*;
 
 /**

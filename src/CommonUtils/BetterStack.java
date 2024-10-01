@@ -1,5 +1,7 @@
 package CommonUtils;
 
+import CommonUtilsOld.BetterStackInterface;
+
 import java.util.EmptyStackException;
 
 /**
