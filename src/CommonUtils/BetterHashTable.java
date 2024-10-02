@@ -148,12 +148,6 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
         }
 
         int index = myHash(key);
-//        if (get(key) != null) {
-//            if (table[index].key == key) {
-//                table[index].value = value;
-//                return;
-//            }
-//        }
         int i = 0;
         int m = this.capacity;
         do {
@@ -182,12 +176,6 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
     /*
     Helper function for insert. adds size, resizes and rehashes if necessary.
      */
-//    private void this.size++ {
-//        this.size++;
-//        if (((double) this.size / (double) this.capacity) > LOAD_FACTOR) {
-//            resize_rehash();
-//        }
-//    }
 
     /**
      * Removes the key, value pair associated with the given key
@@ -252,34 +240,6 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
     @Override
     public boolean containsKey(K key) {
         return (get(key) != null);
-//        int i = 0;
-//        int index;
-//        //System.out.println(264);
-//        while (i < this.capacity) {
-//            index = quad_probe(key, i, 0, 1);
-//            if (index < 0) {
-//                return false;
-//            }
-//            //System.out.println(270);
-//            if ((table[index] == null)) {
-//                if (key == null) {
-//                    return false;
-//                }
-//                //System.out.println(275);
-//                i++;
-//                continue;
-//            }
-//            if (table[index] == DELETED) {
-//                i++;
-//                continue;
-//            }
-//            //System.out.println(281);
-//            if (table[index].key.equals(key)) {
-//                return true;
-//            }
-//            //System.out.println(285);
-//            i++;
-//        }
     }
 
     /**
@@ -306,15 +266,7 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
 
     public int quad_probe(K key, int i, int c_1, int c_2) {
         int res = (myHash(key) + c_1 * i + c_2 * i * i) % this.capacity;
-//        res = (res + this.capacity) % this.capacity;
         if (res < 0) {
-//            //System.out.println("res, c1, c2, i, i^2, cap");
-//            //System.out.println(res);
-//            //System.out.println(c_1);
-//            //System.out.println(c_2);
-//            //System.out.println(i);
-//            //System.out.println(i * i);
-//            //System.out.println(this.capacity);
             return -1;
         }
         return (res);
@@ -332,18 +284,14 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
             }
         }
         Node<K, V> old_table[]  = this.table;
-//        //System.out.println(new_cap);
         try {
             this.table = (Node<K, V>[]) new Node[new_cap];
         } catch (OutOfMemoryError e) {
             //System.out.println(e);
         }
         this.capacity = new_cap;
-//        System.out.println("size");
-//        System.out.println(this.size);
         this.size = 0;
         for (Node node : old_table) {
-//            System.out.println("here");
             if ((node != null) && (node != DELETED)) {
                 insert((K) node.key, (V) node.value);
             }

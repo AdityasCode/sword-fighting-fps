@@ -161,12 +161,12 @@ public class MinHeap<E extends Comparable<E>> implements MinHeapInterface<E> {
 
     @Override
     public String toString() {
-        String res =  "MinHeap{" +
-                "heap=";
+        StringBuilder res = new StringBuilder("MinHeap{" +
+                "heap=");
         for (E item : this.heap) {
-            res += item.toString() + "; ";
+            res.append(item.toString()).append("; ");
         }
-        res += "}";
-        return res;
+        res.append("}");
+        return res.toString();
     }
 }
