@@ -143,42 +143,34 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
         if (key == null) {
             return;
         }
+        if (((double) this.size / (double) this.capacity) >= LOAD_FACTOR) {
+            resize_rehash();
+        }
 
         int index = myHash(key);
-        if ((table[index] == null) || (table[index] == DELETED)) {
-            table[index] = new Node<>(key,value);
-            resize_rehash_after_insertion();
-            return;
-        }
-        if (get(key) != null) {
-            if (table[index].key == key) {
-                table[index].value = value;
-                return;
-            }
-        }
-
+//        if (get(key) != null) {
+//            if (table[index].key == key) {
+//                table[index].value = value;
+//                return;
+//            }
+//        }
         int i = 0;
         int m = this.capacity;
-        while (i != m) {
-            index = quad_probe(key, i, 0, 1);
-//            while (j < 0) {
-//                resize_rehash();
-//                j = quad_probe(key, i, 2, 1);
-//            }
+        do {
             if ((table[index] == null) || (table[index] == DELETED)) {
                 table[index] = new Node<>(key,value);
-                resize_rehash_after_insertion();
+                this.size++;
                 return;
             }
             if (table[index].key == key) {
                 table[index].value = value;
                 return;
             }
-            i++;
-        }
+            index = quad_probe(key, i, 0, 1);
+            i += 1;
+        } while (i != m);
 
         // insert failed. rehash, resize, everything, again.
-
         resize_rehash();
         insert(key, value);
     }
@@ -190,12 +182,12 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
     /*
     Helper function for insert. adds size, resizes and rehashes if necessary.
      */
-    private void resize_rehash_after_insertion() {
-        this.size++;
-        if (((double) this.size / (double) this.capacity) > LOAD_FACTOR) {
-            resize_rehash();
-        }
-    }
+//    private void this.size++ {
+//        this.size++;
+//        if (((double) this.size / (double) this.capacity) > LOAD_FACTOR) {
+//            resize_rehash();
+//        }
+//    }
 
     /**
      * Removes the key, value pair associated with the given key
@@ -228,7 +220,7 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
      */
     @Override
     public V get(K key) {
-        if (size == 0) {
+        if ((size == 0) || (key == null)) {
             return null;
         }
         int i = 0;
@@ -259,36 +251,35 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
      */
     @Override
     public boolean containsKey(K key) {
-        int i = 0;
-        int index;
-        //System.out.println(264);
-        while (i < this.capacity) {
-            index = quad_probe(key, i, 0, 1);
-            if (index < 0) {
-                return false;
-            }
-            //System.out.println(270);
-            if ((table[index] == null)) {
-                if (key == null) {
-                    System.out.println("true");
-                    return true;
-                }
-                //System.out.println(275);
-                i++;
-                continue;
-            }
-            if (table[index] == DELETED) {
-                i++;
-                continue;
-            }
-            //System.out.println(281);
-            if (table[index].key.equals(key)) {
-                return true;
-            }
-            //System.out.println(285);
-            i++;
-        }
-        return false;
+        return (get(key) != null);
+//        int i = 0;
+//        int index;
+//        //System.out.println(264);
+//        while (i < this.capacity) {
+//            index = quad_probe(key, i, 0, 1);
+//            if (index < 0) {
+//                return false;
+//            }
+//            //System.out.println(270);
+//            if ((table[index] == null)) {
+//                if (key == null) {
+//                    return false;
+//                }
+//                //System.out.println(275);
+//                i++;
+//                continue;
+//            }
+//            if (table[index] == DELETED) {
+//                i++;
+//                continue;
+//            }
+//            //System.out.println(281);
+//            if (table[index].key.equals(key)) {
+//                return true;
+//            }
+//            //System.out.println(285);
+//            i++;
+//        }
     }
 
     /**

@@ -36,10 +36,6 @@ public abstract class SizeEmptyBasicAddRemoveBackTestFactory {
         try {
             //2s
             for(long i=0, j=1; i<2*maxElementsInContainer(); i+=2, j++){
-//            for(long i=0, j=1; i<100000; i+=2, j++){
-//                if (i == 10000000) {
-//                    System.out.println("here");
-//                }
                 add(i);
                 assertEquals(j, getSize());
             }
