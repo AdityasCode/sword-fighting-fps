@@ -58,7 +58,7 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
 
         Node(K key, V value){ this.key = key; this.value = value; }
 
-        //default intellij-generated tostring
+        //default intellij-generated toString
         @Override
         public String toString() {
             return "Node{" + "key=" + key + ", value=" + value + '}';
@@ -76,7 +76,6 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
 
     /**
      * Default entry to use when marking a slot as deleted.
-     *
      * <bold>251 students: When you remove an entry in the table, you cannot simply set it to null.
      *    Because we are using quadratic probing, there could be a "chain" of probing misses
      *    which would be disrupted if we just set the current node to null.  Having a "deleted"
@@ -94,7 +93,6 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
 
     /**
      * Constructs the hash table with a default size
-     *
      * <bold>251 Students: the syntax for this is a little weird, here is the easiest
      * way to create a list of Node<K, V>:
      *       (Node<K, V>[]) new Node[capacity_here_if_you_need_it]
@@ -283,17 +281,13 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
                 throw new OutOfMemoryError();
             }
         }
-        Node<K, V> old_table[]  = this.table;
-        try {
-            this.table = (Node<K, V>[]) new Node[new_cap];
-        } catch (OutOfMemoryError e) {
-            //System.out.println(e);
-        }
+        Node<K, V>[] old_table  = this.table;
         this.capacity = new_cap;
+        this.clear();
         this.size = 0;
-        for (Node node : old_table) {
+        for (Node<K, V> node : old_table) {
             if ((node != null) && (node != DELETED)) {
-                insert((K) node.key, (V) node.value);
+                insert( node.key, node.value);
             }
         }
     }
@@ -322,9 +316,5 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
         if(g != null) g.getColor();
         //todo GRAPHICS DEVELOPER:: visualization is to be time-based -- how we discussed
         //251 STUDENTS:: YOU ARE NOT THE GRAPHICS DEVELOPER!
-    }
-
-    public int getCapacity() {
-        return capacity;
     }
 }
