@@ -3,6 +3,7 @@ package CommonUtils;
 import CommonUtils.Interfaces.BetterHashTableInterface;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -316,5 +317,18 @@ public class BetterHashTable<K, V> implements BetterHashTableInterface<K, V> {
         if(g != null) g.getColor();
         //todo GRAPHICS DEVELOPER:: visualization is to be time-based -- how we discussed
         //251 STUDENTS:: YOU ARE NOT THE GRAPHICS DEVELOPER!
+    }
+
+    @Override
+    public String toString() {
+        String res = "BetterHashTable{" +
+                "capacity=" + capacity +
+                ", size=" + size +
+                ", table=";
+        for (String s : Arrays.toString(table).split(", Node")) {
+            res += "Node" + (s) + '\n';
+        }
+        res += '}';
+        return res;
     }
 }

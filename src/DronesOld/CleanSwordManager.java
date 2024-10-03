@@ -112,7 +112,6 @@ public class CleanSwordManager implements CleanSwordManagerInterface {
             }
             myNuke2 = 0;
 
-            //todo
 
         } catch (IOException e) {
             //This should never happen... uh oh o.o
