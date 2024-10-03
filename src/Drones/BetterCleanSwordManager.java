@@ -2,7 +2,6 @@ package Drones;
 
 import CommonUtils.BetterHashTable;
 import CommonUtils.BetterQueue;
-import CommonUtils.BetterStack;
 import CommonUtils.MinHeap;
 import Drones.Interfaces.BetterCleanSwordManagerInterface;
 import Items.Sword;
@@ -13,6 +12,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+
+import static java.lang.Math.pow;
 
 /**
  * Manages everything regarding the cleaning of swords in our game.  Will be integrated with
@@ -63,6 +64,7 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
             // Get swords' information
 
             MinHeap<Sword> swords_heap = new MinHeap<>();
+            BetterHashTable<Integer, Boolean> sword_tracker = new BetterHashTable<>();
             Sword swords_arr[] = new Sword[n_swords];
             int t, th, hl, l, dps, as;
             String n, dsc, com, sty;
@@ -83,19 +85,21 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
                 sty = line[10].substring(1, line[10].length() - 1);
                 Sword s = new Sword(t, th, hl, l, dps, as, n, dsc, com, sty);
                 s.setCleanliness(cleanliness);
+                s.setIndex(-1);
                 swords_arr[i] = s;
                 if (cleanliness != -1) {
-                    System.out.println("this is the first: " + dps);
+                    s.setIndex(swords_heap.size());
                     swords_heap.add(s);
+                    sword_tracker.insert(s.hashCode(), true);
                 }
-                System.out.println(s);
             }
 
             // Get requests' information
 
 //            int[] requests = new int[n_reqs];
 //            int[] requests_swords_in_hash = new int[n_reqs];
-            ArrayList<RequestPair> requestPairs = new ArrayList<>(n_reqs);
+            BetterQueue<Integer> outstandingRequests= new BetterQueue<>();
+            ArrayList<RequestPair> requestPairArray = new ArrayList<>(n_reqs);
             for (int i = 0; i < n_reqs; i++) {
                 String[] line = bf.readLine().split(", ");
 
@@ -104,7 +108,7 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
                 int time = Integer.parseInt(line[0]);
                 int hash_code = Objects.hash(Integer.parseInt(line[1]), Integer.parseInt(line[2]), Integer.parseInt(line[3]), line[4].substring(1, line[4].length() - 1));
                 String s = Integer.parseInt(line[1]) + " " + Integer.parseInt(line[2]) + " " + Integer.parseInt(line[3]) + " " + line[4];
-                requestPairs.add(new RequestPair(time, hash_code));
+                requestPairArray.add(new RequestPair(time, hash_code));
             }
 
             // Create hashtable for swords.
@@ -113,24 +117,6 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
             for (Sword sword : swords_arr) {
                 swords_hash_table.insert(sword.hashCode(), sword);
             }
-
-            // Create minHeap for requests.
-
-            MinHeap<RequestPair> requestPairMinHeap= new MinHeap<RequestPair>();
-            for (int i = 0; i < n_reqs; i++) {
-                RequestPair curr_req_pair = requestPairs.get(i);
-                requestPairMinHeap.add(curr_req_pair);
-            }
-
-            // ALTERNATIVE APPROACH: Create BetterQueue for requests.
-
-            BetterQueue<Integer> outstandingRequests= new BetterQueue<>();
-            ArrayList<RequestPair> requestPairArray = new ArrayList<>();
-            for (int i = n_reqs - 1; i >= 0; i--) {
-                RequestPair curr_req_pair = requestPairs.get(i);
-                requestPairArray.add(curr_req_pair);
-            }
-
 
             /* Iterate through time. End if queue is empty.
              * At a time t, we first take care of the urgent tasks: checking if
@@ -151,22 +137,28 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
                  * array.
                  */
 
-                System.out.println("AT TIME " + time);
-                while ((!requestPairArray.isEmpty()) && (requestPairArray.get(requestPairArray.size() - 1).time == time)) {
-                    outstandingRequests.add(requestPairArray.get(requestPairArray.size() - 1).time);
-                    Sword swordFromRequest = swords_hash_table.get(requestPairArray.get(requestPairArray.size() - 1).sword_hash);
-                    swordFromRequest.setCleanliness(swordFromRequest.getTimeToClean() + time);
-                    swords_heap.add(swordFromRequest);
-                    requestPairArray.remove(requestPairArray.size() - 1);
+//                System.out.println("AT TIME " + time);
+                double i = 0;
+                while ((!requestPairArray.isEmpty()) && (requestPairArray.get(0).time == time)) {
+                    outstandingRequests.add(requestPairArray.get(0).time);
+                    Sword swordFromRequest = swords_hash_table.get(requestPairArray.get(0).sword_hash);
+                    if (sword_tracker.get(swordFromRequest.hashCode()) == null) {
+                        swordFromRequest.setCleanliness(swordFromRequest.getTimeToClean() + time + (i / 10000));
+                        swordFromRequest.setIndex(swords_heap.size());
+                        swords_heap.add(swordFromRequest);
+                        sword_tracker.insert(swordFromRequest.hashCode(), true);
+                    }
+                    requestPairArray.remove(0);
+                    i++;
                 }
 
                 // If all requests fulfilled, end program.
 
                 if (results.size() == n_reqs) {
-                    if (results.size() != n_reqs) {
-                        System.out.println("MASSIVE ERROR");
-                    }
-                    System.out.println("empty here");
+//                    if (results.size() != n_reqs) {
+//                        System.out.println("MASSIVE ERROR");
+//                    }
+//                    System.out.println("empty here");
                     return results;
                 }
 
@@ -174,14 +166,13 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
                 // a request pair from the queue and add it to results.
                 // remove the sword used from the heap.
 
-                while ((outstandingRequests.size() != 0) && (swords_heap.peekMin().getCleanliness() <= time)) {
+                while ((outstandingRequests.size() != 0) && (((long) swords_heap.peekMin().getCleanliness()) <= time)) {
+
                     Integer removedElement = outstandingRequests.remove();
 //                    System.out.println("removed element is " + removedElement);
                     Sword swordUsed = swords_heap.removeMin();
+                    sword_tracker.remove(swordUsed.hashCode());
                     results.add(new DetailedCleanSwordTime<>(time, (time - removedElement), swordUsed));
-//                    Sword swordReturned = swords_hash_table.get(pairToRemove.sword_hash);
-//                    swordReturned.setCleanliness(swordUsed.getTimeToClean() + time);
-//                    swords_heap.add(swordUsed);
                 }
                 time++;
             }
