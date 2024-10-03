@@ -149,6 +149,7 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
                 while ((outstandingRequests.size() != 0) && (((long) swords_heap.peekMin().getCleanliness()) <= time)) {
 
                     Integer removedElement = outstandingRequests.remove();
+//                    System.out.println("removed element is " + removedElement);
                     Sword swordUsed = swords_heap.removeMin();
                     sword_tracker.remove(swordUsed.hashCode());
                     results.add(new DetailedCleanSwordTime<>(time, (time - removedElement), swordUsed));
@@ -160,6 +161,11 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
             //This should never happen... uh oh o.o
             System.err.println("ATTENTION TAs: Couldn't find test file: \"" + filename + "\":: " + e.getMessage());
             System.exit(1);
+        }
+        System.out.println();
+        System.out.println();
+        for (DetailedCleanSwordTime<SwordType> result : results) {
+            System.out.println(result);
         }
         return results;
     }
