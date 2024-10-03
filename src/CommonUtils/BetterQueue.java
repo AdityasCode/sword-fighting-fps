@@ -57,7 +57,6 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
     }
 
     public void setSize(int size) {
-        //System.out.printf("size changed from %d to %d\n", this.size, size);
         this.size = size;
     }
 
@@ -148,7 +147,6 @@ public class BetterQueue<E> implements BetterQueueInterface<E> {
      */
     @Override
     public void add(E item) {
-        //System.out.println("element adding: " + item);
         //todo
         if (item == null) {
             throw new NullPointerException();

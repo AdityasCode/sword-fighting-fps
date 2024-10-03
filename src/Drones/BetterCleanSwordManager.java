@@ -46,21 +46,6 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
             int n_swords = Integer.parseInt(currLine.split(" ")[0]);
             int n_reqs = Integer.parseInt(currLine.split(" ")[1]);
 
-//            // Get each sword info
-//
-//            int i = 0;
-//            while ((currLine = bf.readLine()) != null) {
-//                if (i == n_swords) {
-//                    throw new InputMismatchException();
-//                }
-//                Sword currSword = new Sword(Integer.parseInt(currLine.split(", ")[0]), Integer.parseInt(currLine.split(", ")[1]), Integer.parseInt(currLine.split(", ")[2]), Integer.parseInt(currLine.split(", ")[3]), Integer.parseInt(currLine.split(", ")[4]), Integer.parseInt(currLine.split(", ")[5]), currLine.split(", ")[6], currLine.split(", ")[7], currLine.split(", ")[8], currLine.split(", ")[9]);
-//                swords[i] = currSword;
-//                i++;
-//            }
-//            for (i = 0; i < n_swords; i++) {
-//                System.out.println(swords[i]);
-//            }
-//            i = 0;
             // Get swords' information
 
             MinHeap<Sword> swords_heap = new MinHeap<>();
@@ -137,7 +122,6 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
                  * array.
                  */
 
-//                System.out.println("AT TIME " + time);
                 double i = 0;
                 while ((!requestPairArray.isEmpty()) && (requestPairArray.get(0).time == time)) {
                     outstandingRequests.add(requestPairArray.get(0).time);
@@ -155,10 +139,6 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
                 // If all requests fulfilled, end program.
 
                 if (results.size() == n_reqs) {
-//                    if (results.size() != n_reqs) {
-//                        System.out.println("MASSIVE ERROR");
-//                    }
-//                    System.out.println("empty here");
                     return results;
                 }
 
@@ -169,7 +149,6 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
                 while ((outstandingRequests.size() != 0) && (((long) swords_heap.peekMin().getCleanliness()) <= time)) {
 
                     Integer removedElement = outstandingRequests.remove();
-//                    System.out.println("removed element is " + removedElement);
                     Sword swordUsed = swords_heap.removeMin();
                     sword_tracker.remove(swordUsed.hashCode());
                     results.add(new DetailedCleanSwordTime<>(time, (time - removedElement), swordUsed));
@@ -181,11 +160,6 @@ public class BetterCleanSwordManager implements BetterCleanSwordManagerInterface
             //This should never happen... uh oh o.o
             System.err.println("ATTENTION TAs: Couldn't find test file: \"" + filename + "\":: " + e.getMessage());
             System.exit(1);
-        }
-        System.out.println();
-        System.out.println();
-        for (DetailedCleanSwordTime<SwordType> result : results) {
-            System.out.println(result);
         }
         return results;
     }

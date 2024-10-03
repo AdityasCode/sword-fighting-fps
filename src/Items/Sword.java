@@ -99,8 +99,6 @@ public class Sword extends SwordType implements Comparable<Sword> {
         if ((comp = String.CASE_INSENSITIVE_ORDER.compare(this.getComments(), o.getComments())) != 0) {
             return comp;
         }
-        System.out.println("here");
-        System.out.println(String.CASE_INSENSITIVE_ORDER.compare(this.getStyle(), o.getStyle()));
         return (String.CASE_INSENSITIVE_ORDER.compare(this.getStyle(), o.getStyle()));
     }
 
